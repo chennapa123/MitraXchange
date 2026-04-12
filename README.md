@@ -11,7 +11,9 @@ A full-stack MERN web application that lets neighbors share household items — 
 | Frontend   | React 18, React Router v6, CSS      |
 | Backend    | Node.js, Express.js                 |
 | Database   | MongoDB + Mongoose                  |
-| Auth       | JWT  |
+| Auth       | JWT + bcryptjs                      |
+| Real-time  | Socket.io                           |
+| Uploads    | Multer                              |
 
 
 ---
