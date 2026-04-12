@@ -1,4 +1,4 @@
-# 🏘️ NeighborShare — Neighborhood Resource Exchange Platform
+# 🏘️MitraExchange— Neighborhood Resource Exchange Platform
 
 A full-stack MERN web application that lets neighbors share household items — borrow a drill, lend a book, build community.
 
