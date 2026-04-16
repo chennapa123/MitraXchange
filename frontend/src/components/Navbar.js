@@ -21,7 +21,7 @@ const Navbar = () => {
       <div className="container navbar-inner">
         <Link to="/" className="navbar-brand">
           <span className="brand-icon">🏘️</span>
-          <span className="brand-name">NeighbourShare</span>
+          <span className="brand-name">MitraXchange</span>
         </Link>
 
         <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
