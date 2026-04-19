@@ -40,7 +40,7 @@ const Home = () => {
       <div className="hero">
         <div className="container">
           <h1 className="hero-title">Share More, Waste Less 🌱</h1>
-          <p className="hero-sub">Borrow tools, books, and more from neighbors — free of charge</p>
+          <p className="hero-sub">Borrow tools, books, and more from neighbours — free of charge</p>
           <form className="search-bar" onSubmit={handleSearch}>
             <input
               className="input search-input"

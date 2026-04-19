@@ -1,29 +1,92 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
 const Register = () => {
-  const [form, setForm] = useState({ name: '', email: '', password: '', location: '' });
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', location: '' });
+  const [errors, setErrors] = useState({});
+  const [generalError, setGeneralError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, googleLogin } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  // Validation functions
+  const validateName = (name) => {
+    if (!name.trim()) return 'Full name is required';
+    if (name.trim().length < 2) return 'Name must be at least 2 characters';
+    if (name.trim().length > 50) return 'Name must be less than 50 characters';
+    if (!/^[a-zA-Z\s'-]+$/.test(name)) return 'Name can only contain letters, spaces, hyphens, and apostrophes';
+    return '';
+  };
+
+  const validateEmail = (email) => {
+    if (!email.trim()) return 'Email is required';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return 'Please enter a valid email address';
+    return '';
+  };
+
+  const validatePassword = (password) => {
+    if (!password) return 'Password is required';
+    if (password.length < 6) return 'Password must be at least 6 characters';
+    if (password.length > 50) return 'Password must be less than 50 characters';
+    if (!/(?=.*[a-z])/.test(password)) return 'Password must contain at least one lowercase letter';
+    if (!/(?=.*[A-Z])/.test(password)) return 'Password must contain at least one uppercase letter';
+    if (!/(?=.*\d)/.test(password)) return 'Password must contain at least one number';
+    return '';
+  };
+
+  const validateConfirmPassword = (password, confirmPassword) => {
+    if (!confirmPassword) return 'Please confirm your password';
+    if (password !== confirmPassword) return 'Passwords do not match';
+    return '';
+  };
+
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    newErrors.name = validateName(form.name);
+    newErrors.email = validateEmail(form.email);
+    newErrors.password = validatePassword(form.password);
+    newErrors.confirmPassword = validateConfirmPassword(form.password, form.confirmPassword);
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(err => err !== '');
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setError('');
-    if (form.password.length < 6) {
-      return setError('Password must be at least 6 characters');
-    }
+    setGeneralError('');
+
+    if (!validateForm()) return;
+
     setLoading(true);
     try {
       await register(form.name, form.email, form.password, form.location);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setGeneralError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async (credentialResponse) => {
+    setGeneralError('');
+    setLoading(true);
+    try {
+      await googleLogin(credentialResponse);
+      navigate('/');
+    } catch (err) {
+      setGeneralError(err.response?.data?.message || err.message || 'Google registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -37,32 +100,96 @@ const Register = () => {
           <h2>Join NeighborShare</h2>
           <p>Start sharing with your community</p>
         </div>
-        {error && <div className="alert alert-error">{error}</div>}
+        {generalError && <div className="alert alert-error">{generalError}</div>}
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Full Name</label>
-            <input className="input" type="text" name="name" placeholder="Your name"
-              value={form.name} onChange={handleChange} required />
+            <input 
+              className={`input ${errors.name ? 'input-error' : ''}`} 
+              type="text" 
+              name="name" 
+              placeholder="Your full name"
+              value={form.name} 
+              onChange={handleChange}
+              onBlur={() => setErrors({ ...errors, name: validateName(form.name) })}
+            />
+            {errors.name && <span className="error-message">{errors.name}</span>}
           </div>
+          
           <div className="form-group">
             <label>Email</label>
-            <input className="input" type="email" name="email" placeholder="you@example.com"
-              value={form.email} onChange={handleChange} required />
+            <input 
+              className={`input ${errors.email ? 'input-error' : ''}`} 
+              type="email" 
+              name="email" 
+              placeholder="you@example.com"
+              value={form.email} 
+              onChange={handleChange}
+              onBlur={() => setErrors({ ...errors, email: validateEmail(form.email) })}
+            />
+            {errors.email && <span className="error-message">{errors.email}</span>}
           </div>
+          
           <div className="form-group">
             <label>Password</label>
-            <input className="input" type="password" name="password" placeholder="Min 6 characters"
-              value={form.password} onChange={handleChange} required />
+            <input 
+              className={`input ${errors.password ? 'input-error' : ''}`} 
+              type="password" 
+              name="password" 
+              placeholder="Min 6 characters with uppercase, lowercase, and number"
+              value={form.password} 
+              onChange={handleChange}
+              onBlur={() => setErrors({ ...errors, password: validatePassword(form.password) })}
+            />
+            {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
+          
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input 
+              className={`input ${errors.confirmPassword ? 'input-error' : ''}`} 
+              type="password" 
+              name="confirmPassword" 
+              placeholder="Confirm your password"
+              value={form.confirmPassword} 
+              onChange={handleChange}
+              onBlur={() => setErrors({ ...errors, confirmPassword: validateConfirmPassword(form.password, form.confirmPassword) })}
+            />
+            {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+          </div>
+          
           <div className="form-group">
             <label>Neighborhood / Location <span style={{color:'var(--gray-400)',fontWeight:400}}>(optional)</span></label>
-            <input className="input" type="text" name="location" placeholder="e.g. Mangalagiri, AP"
-              value={form.location} onChange={handleChange} />
+            <input 
+              className="input" 
+              type="text" 
+              name="location" 
+              placeholder="e.g. Mangalagiri, AP"
+              value={form.location} 
+              onChange={handleChange} 
+            />
           </div>
+          
           <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={loading}>
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
+
+        <div className="divider">
+          <span>OR</span>
+        </div>
+
+        <div className="google-login-wrapper">
+          <GoogleLogin
+            onSuccess={handleGoogleLogin}
+            onError={() => setGeneralError('Google registration failed. Please try again.')}
+            theme="outline"
+            size="large"
+            width="100%"
+          />
+        </div>
+
         <p className="auth-footer">
           Already have an account? <Link to="/login">Sign in</Link>
         </p>

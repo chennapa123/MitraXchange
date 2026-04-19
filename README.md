@@ -1,4 +1,4 @@
-# 🏘️ NeighborShare — Neighborhood Resource Exchange Platform
+# 🏘️ MitraXchange — Neighborhood Resource Exchange Platform
 
 A full-stack MERN web application that lets neighbors share household items — borrow a drill, lend a book, build community.
 
@@ -11,7 +11,7 @@ A full-stack MERN web application that lets neighbors share household items — 
 | Frontend   | React 18, React Router v6, CSS      |
 | Backend    | Node.js, Express.js                 |
 | Database   | MongoDB + Mongoose                  |
-| Auth       | JWT + bcryptjs                      |
+| Auth       | JWT + bcryptjs + Google OAuth 2.0   |
 | Real-time  | Socket.io                           |
 | Uploads    | Multer                              |
 
@@ -74,6 +74,7 @@ PORT=5000
 MONGO_URI=mongodb://localhost:27017/neighborhood_exchange
 JWT_SECRET=replace_with_a_strong_random_secret
 NODE_ENV=development
+GOOGLE_CLIENT_ID=your_google_client_id_here.apps.googleusercontent.com
 ```
 
 Create the uploads folder:
@@ -100,7 +101,19 @@ cd ../frontend
 # Install dependencies  
 npm install
 
-# Start React dev server
+# Create your .env file
+touch .env
+```
+
+Edit `frontend/.env` and add your Google Client ID:
+```
+REACT_APP_GOOGLE_CLIENT_ID=your_google_client_id_here.apps.googleusercontent.com
+```
+
+> **Get Google Client ID:** Follow the [Google OAuth Quick Start Guide](./GOOGLE_OAUTH_QUICKSTART.md)
+
+Start React dev server:
+```bash
 npm start
 ```
 
@@ -110,7 +123,8 @@ Frontend runs at: **http://localhost:3000**
 
 ## 🔑 Key Features
 
-- **User Auth** — Register, Login, JWT-protected routes
+- **User Auth** — Register/Login with email & password, or **Google OAuth**
+- **Form Validation** — Real-time email, password, and name validation
 - **Item Listing** — Add items with photo, category, condition
 - **Browse & Search** — Filter by category, search by name
 - **Borrow Requests** — Send request → Owner approves/rejects → Mark returned
@@ -127,6 +141,7 @@ Frontend runs at: **http://localhost:3000**
 |--------|--------------------|--------------------|
 | POST   | /api/auth/register | Register user      |
 | POST   | /api/auth/login    | Login              |
+| POST   | /api/auth/google   | Google OAuth login |
 | GET    | /api/auth/me       | Get current user   |
 
 ### Items
@@ -176,7 +191,50 @@ Frontend runs at: **http://localhost:3000**
 
 ---
 
-## 🌱 Optional Enhancements (from spec)
+## 🔐 Google OAuth Setup
+
+NeighborShare supports **Google OAuth 2.0** for quick and secure authentication.
+
+### Quick Setup (5 minutes)
+
+1. **Get Google Client ID** from [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project → APIs & Services → Credentials
+   - Create OAuth 2.0 Web Application credentials
+   - Add redirect URI: `http://localhost:3000`
+
+2. **Update environment variables:**
+   - `frontend/.env`: Add `REACT_APP_GOOGLE_CLIENT_ID=your_client_id`
+   - `backend/.env`: Add `GOOGLE_CLIENT_ID=your_client_id`
+
+3. **Restart both servers** and you're done!
+
+**See [GOOGLE_OAUTH_QUICKSTART.md](./GOOGLE_OAUTH_QUICKSTART.md) for detailed instructions.**
+
+### Features
+- One-click sign-up and sign-in
+- Automatic user account creation
+- Profile image sync from Google
+- Existing users can sign in via Google
+
+---
+
+## ✅ Form Validation
+
+Both **Register** and **Login** pages include comprehensive client-side validation:
+
+### Registration
+- **Name**: 2-50 characters, letters/spaces/hyphens/apostrophes only
+- **Email**: Valid email format required
+- **Password**: Min 6 characters, uppercase, lowercase, and numbers
+- **Confirm Password**: Must match password
+- **Real-time error messages** as you type
+
+### Login
+- **Email**: Valid email format required
+- **Password**: Required and checked for minimum length
+- **Clear error feedback** on failed attempts
+
+---
 
 - [ ] Rating & Review system
 - [ ] Geo-location based filtering

@@ -50,3 +50,121 @@
 .auth-footer a:hover {
   text-decoration: underline;
 }
+
+/* Validation Styles */
+.input-error {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2;
+}
+
+.input-error:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-message {
+  display: block;
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--gray-400);
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--gray-200);
+}
+
+/* Google Login Wrapper */
+.google-login-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.google-login-wrapper > div {
+  width: 100% !important;
+}
+
+/* Google Button Styles */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #fff;
+  border: 1px solid var(--gray-300);
+  color: var(--gray-700);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-google:hover:not(:disabled) {
+  background-color: #f9f9f9;
+  border-color: var(--gray-400);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-google:active:not(:disabled) {
+  background-color: #f3f3f3;
+}
+
+.btn-google:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-google-disabled {
+  background-color: #f5f5f5 !important;
+  border-color: var(--gray-200) !important;
+  color: var(--gray-400) !important;
+  cursor: not-allowed !important;
+}
+
+.btn-google-disabled:hover {
+  background-color: #f5f5f5 !important;
+  border-color: var(--gray-200) !important;
+  box-shadow: none !important;
+}
+
+.btn-google svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.5;
+}
+
+/* Input focus states */
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.input {
+  transition: all 0.2s ease;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-700);
+}

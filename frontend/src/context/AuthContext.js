@@ -40,6 +40,25 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
+  const googleLogin = async (credentialResponse) => {
+    try {
+      if (!credentialResponse || !credentialResponse.credential) {
+        throw new Error('Google authentication credentials not available.');
+      }
+      
+      const res = await axios.post('/api/auth/google', {
+        idToken: credentialResponse.credential
+      });
+      
+      localStorage.setItem('token', res.data.token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
+      setUser(res.data.user);
+      return res.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
@@ -47,8 +66,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, googleLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
