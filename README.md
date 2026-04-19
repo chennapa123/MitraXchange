@@ -15,6 +15,7 @@ A full-stack MERN web application that lets neighbors share household items — 
 | Real-time  | Socket.io                           |
 | Uploads    | Multer                              |
 
+
 ---
 
 ## 📁 Project Structure
