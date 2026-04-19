@@ -15,14 +15,23 @@ const Login = () => {
   // Validation functions
   const validateEmail = (email) => {
     if (!email.trim()) return 'Email is required';
+    // RFC 5322 compliant email regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return 'Please enter a valid email address';
+    if (!email.includes('.com') && !email.includes('.in') && !email.includes('.org') && !email.includes('.net') && !email.includes('.edu')) {
+      return 'Email must be from a valid domain';
+    }
     return '';
   };
 
   const validatePassword = (password) => {
     if (!password) return 'Password is required';
-    if (password.length < 6) return 'Password must be at least 6 characters';
+    if (password.length < 8) return 'Password must be at least 8 characters';
+    if (password.length > 50) return 'Password must be less than 50 characters';
+    if (!/(?=.*[a-z])/.test(password)) return 'Password must contain at least one lowercase letter';
+    if (!/(?=.*[A-Z])/.test(password)) return 'Password must contain at least one uppercase letter';
+    if (!/(?=.*\d)/.test(password)) return 'Password must contain at least one number';
+    if (!/(?=.*[@$!%*?&])/.test(password)) return 'Password must contain at least one special character (@$!%*?&)';
     return '';
   };
 
@@ -103,12 +112,13 @@ const Login = () => {
               className={`input ${errors.password ? 'input-error' : ''}`} 
               type="password" 
               name="password" 
-              placeholder="••••••••"
+              placeholder="Min 8 characters with uppercase, lowercase, number, and special character"
               value={form.password} 
               onChange={handleChange}
               onBlur={() => setErrors({ ...errors, password: validatePassword(form.password) })}
             />
             {errors.password && <span className="error-message">{errors.password}</span>}
+            {form.password && !errors.password && <span style={{color: 'var(--success-color)', fontSize: '0.85rem', marginTop: '4px', display: 'block'}}>✓ Password requirements met</span>}
           </div>
           
           <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={loading}>

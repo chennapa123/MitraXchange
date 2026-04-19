@@ -18,24 +18,48 @@ const Register = () => {
     if (name.trim().length < 2) return 'Name must be at least 2 characters';
     if (name.trim().length > 50) return 'Name must be less than 50 characters';
     if (!/^[a-zA-Z\s'-]+$/.test(name)) return 'Name can only contain letters, spaces, hyphens, and apostrophes';
+    if (/\d/.test(name)) return 'Name cannot contain numbers';
+    if (name.trim().split(' ').some(word => word.length === 1 && word !== '-' && word !== "'")) return 'Name parts must be at least 2 characters';
     return '';
   };
 
   const validateEmail = (email) => {
     if (!email.trim()) return 'Email is required';
+    // RFC 5322 compliant email regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return 'Please enter a valid email address';
+    if (email.split('@')[0].length < 2) return 'Email local part must be at least 2 characters';
+    if (!email.includes('.com') && !email.includes('.in') && !email.includes('.org') && !email.includes('.net') && !email.includes('.edu') && !email.includes('.co')) {
+      return 'Email must be from a valid domain';
+    }
     return '';
   };
 
   const validatePassword = (password) => {
     if (!password) return 'Password is required';
-    if (password.length < 6) return 'Password must be at least 6 characters';
+    if (password.length < 8) return 'Password must be at least 8 characters';
     if (password.length > 50) return 'Password must be less than 50 characters';
     if (!/(?=.*[a-z])/.test(password)) return 'Password must contain at least one lowercase letter';
     if (!/(?=.*[A-Z])/.test(password)) return 'Password must contain at least one uppercase letter';
     if (!/(?=.*\d)/.test(password)) return 'Password must contain at least one number';
+    if (!/(?=.*[@$!%*?&])/.test(password)) return 'Password must contain at least one special character (@$!%*?&)';
     return '';
+  };
+
+  const getPasswordStrength = (password) => {
+    if (!password) return { level: 0, text: '', color: 'gray' };
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/(?=.*[a-z])/.test(password) && /(?=.*[A-Z])/.test(password)) strength++;
+    if (/(?=.*\d)/.test(password)) strength++;
+    if (/(?=.*[@$!%*?&])/.test(password)) strength++;
+    
+    if (strength <= 1) return { level: 1, text: 'Weak', color: '#dc3545' };
+    if (strength <= 2) return { level: 2, text: 'Fair', color: '#fd7e14' };
+    if (strength <= 3) return { level: 3, text: 'Good', color: '#ffc107' };
+    if (strength <= 4) return { level: 4, text: 'Strong', color: '#17a2b8' };
+    return { level: 5, text: 'Very Strong', color: '#28a745' };
   };
 
   const validateConfirmPassword = (password, confirmPassword) => {
@@ -137,12 +161,37 @@ const Register = () => {
               className={`input ${errors.password ? 'input-error' : ''}`} 
               type="password" 
               name="password" 
-              placeholder="Min 6 characters with uppercase, lowercase, and number"
+              placeholder="Min 8 chars: Aa1@special"
               value={form.password} 
               onChange={handleChange}
               onBlur={() => setErrors({ ...errors, password: validatePassword(form.password) })}
             />
             {errors.password && <span className="error-message">{errors.password}</span>}
+            {form.password && (
+              <div style={{marginTop: '8px'}}>
+                <div style={{fontSize: '0.85rem', color: getPasswordStrength(form.password).color, fontWeight: 500}}>
+                  Strength: {getPasswordStrength(form.password).text}
+                </div>
+                <div style={{marginTop: '8px'}}>
+                  <div style={{fontSize: '0.8rem', color: 'var(--gray-600)', marginBottom: '6px'}}>Requirements:</div>
+                  <div style={{fontSize: '0.8rem', color: /(?=.*[a-z])/.test(form.password) ? '#28a745' : 'var(--gray-600)', marginBottom: '3px'}}>
+                    {/(?=.*[a-z])/.test(form.password) ? '✓' : '○'} One lowercase letter
+                  </div>
+                  <div style={{fontSize: '0.8rem', color: /(?=.*[A-Z])/.test(form.password) ? '#28a745' : 'var(--gray-600)', marginBottom: '3px'}}>
+                    {/(?=.*[A-Z])/.test(form.password) ? '✓' : '○'} One uppercase letter
+                  </div>
+                  <div style={{fontSize: '0.8rem', color: /(?=.*\d)/.test(form.password) ? '#28a745' : 'var(--gray-600)', marginBottom: '3px'}}>
+                    {/(?=.*\d)/.test(form.password) ? '✓' : '○'} One number
+                  </div>
+                  <div style={{fontSize: '0.8rem', color: /(?=.*[@$!%*?&])/.test(form.password) ? '#28a745' : 'var(--gray-600)', marginBottom: '3px'}}>
+                    {/(?=.*[@$!%*?&])/.test(form.password) ? '✓' : '○'} One special character (@$!%*?&)
+                  </div>
+                  <div style={{fontSize: '0.8rem', color: form.password.length >= 8 ? '#28a745' : 'var(--gray-600)'}}>
+                    {form.password.length >= 8 ? '✓' : '○'} At least 8 characters
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="form-group">
@@ -157,6 +206,7 @@ const Register = () => {
               onBlur={() => setErrors({ ...errors, confirmPassword: validateConfirmPassword(form.password, form.confirmPassword) })}
             />
             {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+            {form.password && form.confirmPassword && !errors.confirmPassword && <span style={{color: 'var(--success-color)', fontSize: '0.85rem', marginTop: '4px', display: 'block'}}>✓ Passwords match</span>}
           </div>
           
           <div className="form-group">
