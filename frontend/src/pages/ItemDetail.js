@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { getAssetUrl } from '../config/api';
 import './ItemDetail.css';
 
 const categoryEmoji = {
@@ -59,7 +60,7 @@ const ItemDetail = () => {
         {/* Image */}
         <div className="item-detail-img card">
           {item.image ? (
-            <img src={`http://localhost:5000${item.image}`} alt={item.title} />
+            <img src={getAssetUrl(item.image)} alt={item.title} />
           ) : (
             <div className="detail-placeholder">
               <span>{categoryEmoji[item.category] || '📦'}</span>

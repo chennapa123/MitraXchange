@@ -122,6 +122,56 @@ Frontend runs at: **http://localhost:3000**
 
 ---
 
+## Deploy to Vercel + Render
+
+### 1) Deploy backend on Render
+
+- Create a **Web Service** from this repository.
+- Set **Root Directory** to `backend`.
+- Build command: `npm install`
+- Start command: `npm start`
+- Health check path: `/api/health`
+
+Set these environment variables in Render:
+
+```
+NODE_ENV=production
+MONGO_URI=<your_mongodb_atlas_connection_string>
+JWT_SECRET=<a_long_random_secret>
+GOOGLE_CLIENT_ID=<your_google_oauth_client_id>
+FRONTEND_URL=<your_vercel_frontend_url>
+ALLOWED_ORIGINS=<your_vercel_frontend_url>,http://localhost:3000
+```
+
+After deployment, copy your Render backend URL (example: `https://mitraxchange-backend.onrender.com`).
+
+### 2) Deploy frontend on Vercel
+
+- Import the same repository in Vercel.
+- Set **Root Directory** to `frontend`.
+- Framework preset: **Create React App**.
+- Build command: `npm run build`
+- Output directory: `build`
+
+Set these environment variables in Vercel:
+
+```
+REACT_APP_API_URL=<your_render_backend_url>
+REACT_APP_SOCKET_URL=<your_render_backend_url>
+REACT_APP_GOOGLE_CLIENT_ID=<your_google_oauth_client_id>
+```
+
+`frontend/vercel.json` already handles SPA route rewrites.
+
+### 3) Final production checks
+
+1. Update Google OAuth authorized JavaScript origins with your Vercel domain.
+2. Ensure Render `FRONTEND_URL` and `ALLOWED_ORIGINS` include the same Vercel URL.
+3. Test login/register, item create/edit, image loading, borrow flow, and chat.
+4. Verify `/api/health` is responding on Render.
+
+---
+
 ## 🔑 Key Features
 
 - **User Auth** — Register/Login with email & password, or **Google OAuth**

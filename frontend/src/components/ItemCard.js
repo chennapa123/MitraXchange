@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { getAssetUrl } from '../config/api';
 import './ItemCard.css';
 
 const categoryEmoji = {
@@ -15,7 +16,7 @@ const ItemCard = ({ item }) => {
     <Link to={`/items/${item._id}`} className="item-card">
       <div className="item-card-img">
         {item.image ? (
-          <img src={`http://localhost:5000${item.image}`} alt={item.title} />
+          <img src={getAssetUrl(item.image)} alt={item.title} />
         ) : (
           <div className="item-card-placeholder">
             <span>{categoryEmoji[item.category] || '📦'}</span>

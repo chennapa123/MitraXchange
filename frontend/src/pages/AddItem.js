@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import MapView from '../components/MapView';
+import { getAssetUrl } from '../config/api';
 import './AddItem.css';
 
 const CATEGORIES = ['Tools', 'Books', 'Electronics', 'Appliances', 'Sports', 'Furniture', 'Clothing', 'Other'];
@@ -46,7 +47,7 @@ const AddItem = () => {
         const { title, description, category, condition, lat, lng } = res.data;
         setForm({ title, description, category, condition, lat: lat || 20, lng: lng || 78 });
         setSelectedLocation({ lat: lat || 20, lng: lng || 78 });
-        if (res.data.image) setPreview(`http://localhost:5000${res.data.image}`);
+        if (res.data.image) setPreview(getAssetUrl(res.data.image));
       });
     }
   }, [id, isEdit]);

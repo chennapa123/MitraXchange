@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
+import { SOCKET_URL } from '../config/api';
 import './Messages.css';
 
 let socket;
@@ -20,7 +21,7 @@ const Messages = () => {
 
   // Init socket
   useEffect(() => {
-    socket = io('http://localhost:5000');
+    socket = io(SOCKET_URL);
     socket.emit('join', user._id);
     socket.on('receiveMessage', (data) => {
       setMessages(prev => {

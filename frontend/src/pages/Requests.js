@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { getAssetUrl } from '../config/api';
 import './Requests.css';
 
 const statusBadge = {
@@ -70,7 +71,7 @@ const Requests = () => {
             <div key={req._id} className="request-card card">
               <div className="request-item-info">
                 {req.itemId?.image ? (
-                  <img src={`http://localhost:5000${req.itemId.image}`} alt="" className="req-item-img" />
+                  <img src={getAssetUrl(req.itemId.image)} alt="" className="req-item-img" />
                 ) : (
                   <div className="req-item-img-placeholder">📦</div>
                 )}
